@@ -107,11 +107,12 @@
       if($_POST["account"]!=null && $_POST["password"]!=null){
         $query="SELECT * FROM `user` WHERE account='$_POST[account]'";
         $result=mysqli_query($conn,$query);
-      $row=$result->fetch_array(MYSQLI_ASSOC);
+        $row=$result->fetch_array(MYSQLI_ASSOC);
       if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
         echo"<script>alert('登入成功')</script>";
         $_SESSION['account']=$_POST['account'];
         setcookie('account',session_id(),time()+900,'/');
+        // header('Location: /webwork1/index.php');
       }
       else{
         echo"<script>alert('登入失敗，帳號或密碼錯誤');window.location='/webwork1/sign-in/sign-in.php';</script>";
@@ -200,7 +201,15 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <?php
+              if(isset($_COOKIE['account'])){
+                echo "<a class='nav-link active' aria-current='page' href='#'>Ho789me</a>";
+              }
+              else{
+                echo "<a class='nav-link active' aria-current='page' href='#'>Home</a>";
+              }
+            ?>
+            
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
