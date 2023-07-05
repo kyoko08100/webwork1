@@ -99,6 +99,34 @@
     <link href="carousel.css" rel="stylesheet">
   </head>
   <body>
+    <?php
+    $conn=new mysqli("127.0.0.1","root","","webwork");
+    session_start();
+    if(isset($_POST['login'])){
+      if($_POST["account"]!=null && $_POST["password"]!=null){
+        $query="SELECT * FROM `user` WHERE account='$_POST[account]'";
+        $result=mysqli_query($conn,$query);
+        $row=$result->fetch_array(MYSQLI_ASSOC);
+      if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
+        echo"<script>alert('登入成功')</script>";
+      }
+      else{
+        echo"<script>alert('登入失敗，帳號或密碼錯誤');windows.location='/webwork1/sign-in/sign-in.php';</script>";
+      }
+      }
+      else{
+        echo"<script>alert('請輸入帳號密碼');windows.location='/webwork1/sign-in/sign-in.php';</script>";
+      }
+      
+      
+      
+    }
+    if(isset($_POST['register'])){
+      $query="INSERT INTO `user`(`account`,`password`) VALUES ('".$_POST["account"]."','".$_POST["password"]."')";
+      $re=mysqli_query($conn,$query);
+      echo "<script>alert('註冊成功')</script>";
+    }
+    ?>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -154,7 +182,7 @@
 <header data-bs-theme="dark">
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/webwork1/sign-in/sign-in.html">Carousel</a>
+      <a class="navbar-brand" href="/webwork1/sign-in/sign-in.php">Carousel</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

@@ -99,6 +99,10 @@
     <link href="sign-in.css" rel="stylesheet">
   </head>
   <body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <?php
+    $conn=new mysqli("127.0.0.1","root","","webwork")
+    session_start();
+    ?>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -152,16 +156,16 @@
 
     
 <main class="form-signin w-100 m-auto">
-  <form>
+  <form method="post" action="/webwork1/index.php">
     <!-- <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
     <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-      <label for="floatingInput">Account</label>
+    <input type="text" class="form-control" id="Account" placeholder="Account" name="account">
+        <label for="floatingInput">Account</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+      <input type="password" class="form-control" id="Password" placeholder="Password" name="password">
       <label for="floatingPassword">Password</label>
     </div>
 
@@ -171,9 +175,9 @@
         Remember me
       </label> -->
     <!-- </div> -->
-    <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+    <button class="btn btn-primary w-100 py-2" type="submit" name="login">Login</button>
     <div class="my-3">
-    <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+    <button class="btn btn-primary w-100 py-2" type="submit" name="register">Register</button>
   </div>
     <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2023</p>
   </form>
