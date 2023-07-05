@@ -100,7 +100,7 @@
   </head>
   <body class="d-flex align-items-center py-4 bg-body-tertiary">
     <?php
-    $conn=new mysqli("127.0.0.1","root","","webwork")
+    $conn=new mysqli("127.0.0.1","root","","webwork");
     session_start();
     ?>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">

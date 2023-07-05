@@ -100,8 +100,9 @@
   </head>
   <body>
     <?php
-    $conn=new mysqli("127.0.0.1","root","","webwork");
-    session_start();
+    $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
+    session_start(); //開啟session
+    // 登入
     if(isset($_POST['login'])){
       if($_POST["account"]!=null && $_POST["password"]!=null){
         $query="SELECT * FROM `user` WHERE account='$_POST[account]'";
@@ -109,15 +110,17 @@
       $row=$result->fetch_array(MYSQLI_ASSOC);
       if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
         echo"<script>alert('登入成功')</script>";
+        $_SESSION['account']=$_POST['account'];
+        setcookie('account',session_id(),time()+900,'/');
       }
       else{
-        echo"<script>alert('登入失敗，帳號或密碼錯誤');windows.location='/webwork1/sign-in/sign-in.php';</script>";
+        echo"<script>alert('登入失敗，帳號或密碼錯誤');window.location='/webwork1/sign-in/sign-in.php';</script>";
       }
       }
       else{
-        echo"<script>alert('請輸入帳號密碼');windows.location='/webwork1/sign-in/sign-in.php';</script>";
+        echo"<script>alert('請輸入帳號密碼');window.location='/webwork1/sign-in/sign-in.php';</script>";
       }
-      
+     
       
       
     }
@@ -126,6 +129,14 @@
       $re=mysqli_query($conn,$query);
       echo "<script>alert('註冊成功')</script>";
     }
+    if(isset($_GET['d'])){
+      if($_GET['d']==1){
+        session_destroy();
+        setcookie('account','',time()-900,'/');
+        header('Location: /webwork1/index.php');
+      }
+      
+     }
     ?>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
@@ -182,7 +193,7 @@
 <header data-bs-theme="dark">
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/webwork1/sign-in/sign-in.php">Carousel</a>
+      <a class="navbar-brand" href="#">Carousel</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -199,7 +210,21 @@
           </li>
         </ul>
         
-          <a class="nav-link active" href="/webwork1/sign-in/sign-in.html">Sign in</a>
+          
+            <?php
+            // if(!isset($_SESSION['account'])){
+            //   $_SESSION['account']=$_POST['account'];
+            // }
+            
+            if(!isset($_SESSION['account'])){
+              echo "<a class='nav-link active' href='/webwork1/sign-in/sign-in.php'>登入/註冊</a>";
+            }
+            else{
+              echo "<a class='nav-link active' href='/webwork1/index.php?d=1'>登出</a>";
+            }
+            
+            ?>
+          
         
         <!-- <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
