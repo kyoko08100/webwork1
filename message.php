@@ -4,7 +4,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
   <script src="../assets/js/color-modes.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -82,13 +82,9 @@
 </head>
 <body>
     <?php
-    $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
-    if(isset($_COOKIE['account'])){
-        echo"<script>alert('登入成功')</script>";
-       }
-    $query="SELECT * FROM `comment`";
-    $result=mysqli_query($conn,$query);
-    $row=mysqli_fetch_all($result);
+        if(isset($_COOKIE['account']) && !isset($_POST["add_comment"])){
+            echo"<script>alert('登入成功')</script>";
+        }
     ?>
 <header data-bs-theme="dark">
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -149,23 +145,91 @@
       <p>Donec ultricies ligula nec nulla scelerisque, eget lobortis leo tincidunt.</p>
       <button type="button">修改</button>
     </div>
-    
+    <?php
+        $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
+        if(isset($_POST["add_comment"])){ //看有沒有按送出按鈕
+            if($_POST["massage"]==""){ //輸入內容是否為空，這個功能暫時沒用
+                $query="INSERT INTO `comment`(`account`, `date`, `text`) VALUES ('{$_COOKIE["account"]}',now(),'{$_POST["message"]}')";
+                $result=mysqli_query($conn,$query);
+            }
+            else{
+                echo"<script>alert('{$_POST["message"]}')</script>";
+            }
+            
+        }
+        $query="SELECT * FROM `comment`";
+        $result=mysqli_query($conn,$query);
+        $row=mysqli_fetch_all($result);
+        // 印出留言
+        foreach($row as $y => $value){
+            if($value[0] == $_COOKIE["account"]){
+                //有按鈕的
+                echo "<div class='message' id='message-{$y}'> 
+                <p class='name'>".$value[0]."</p>
+                <p class='timestamp'>".$value[1]."</p>
+                <p id='oldTxt-{$y}'>".$value[2]."</p>
+                <button type='button' id='update-{$y}'>修改</button>
+                </div>";
+            }
+            else{
+                //沒按鈕的
+                echo "<div class='message' id='message-{$y}'>
+                <p class='name'>".$value[0]."</p>
+                <p class='timestamp'>".$value[1]."</p>
+                <p id='oldTxt-{$y}'>".$value[2]."</p></div>";
+            }  
+        }
+       
+    ?>
     <!-- 留言表單 -->
-    <form>
-      <div class="form-group">
+    <form method="POST" action="/webwork1/message.php">
+      <!-- <div class="form-group">
         <label for="name">姓名:</label>
         <input type="text" id="name" name="name">
-      </div>
+      </div> -->
       
       <div class="form-group">
         <label for="message">留言:</label>
         <textarea id="message" name="message"></textarea>
       </div>
       
-      <button type="submit">送出</button>
+      <button type="submit" name="add_comment">送出</button>
       
     </form>
 
   </div>
+  <script>
+    $(document).ready(function() {
+
+        $(document).on("click","button[id^='update-']",function(){
+            const id=$(this).attr("id").split("-")[-1];
+            console.log($(this))
+            $("#message-"+id).append(`<textarea id='newTxt-${id}'></textarea>`); //出現textarea
+            $("#message-"+id).append(`<button id='complete-${id}'></button>`); //出現完成按鈕
+            $("#update-"+id).remove(); //移除修改按鈕
+        });//on update
+
+        $(document).on("click","button[id^='complete-']",function(){
+            const id=$(this).attr("id").split("-")[-1];
+            var temp=$("#oldTxt-" + id).text();
+            $("#newTxt-"+id).remove(); //移除textarea
+            $("#complete-"+id).remove(); //移除完成按鈕 
+        });//on complete
+
+        $.ajax({
+            url: 'ajax/temp.php',
+            type: 'POST',
+            data: {index: "id", text:$("#input-" + id).val()},
+            success: function (result) {
+                $('#content').html(result)
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert('Status: ' + textStatus)
+                alert('Error: ' + errorThrown)
+            }
+        }); //ajax
+    }); // ready
+    </script>
 </body>
+
 </html>

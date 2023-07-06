@@ -103,9 +103,6 @@
     $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
     // ini_set('session.gc_maxlifetime',15);
     // session_start(); //開啟session
-    if(isset($_COOKIE['account'])){
-      echo"<script>alert('登入成功')</script>";
-     }
     if(isset($_POST['register'])){
       $query="INSERT INTO `user`(`account`,`password`) VALUES ('".$_POST["account"]."','".$_POST["password"]."')";
       $re=mysqli_query($conn,$query);
@@ -114,8 +111,8 @@
     if(isset($_GET['d'])){
       if($_GET['d']==1){
         // session_destroy();
-        setcookie('account','',time()-9,'/');
-        // header('Location: /webwork1/index.php');
+        setcookie('account','',time()-900,'/');
+        header('Location: /webwork1/index.php');
       }
       
      }

@@ -110,7 +110,7 @@
       if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
         
         // $_SESSION['account']=$_POST['account'];
-        setcookie('account',$_POST['account'],time()+6,'/');
+        setcookie('account',$_POST['account'],time()+9000000,'/');
         
         header('Location: /webwork1/message.php');
         // echo"<script>alert('登入成功')</script>";
