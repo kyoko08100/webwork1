@@ -101,30 +101,11 @@
   <body>
     <?php
     $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
-    session_start(); //開啟session
-    // 登入
-    if(isset($_POST['login'])){
-      if($_POST["account"]!=null && $_POST["password"]!=null){
-        $query="SELECT * FROM `user` WHERE account='$_POST[account]'";
-        $result=mysqli_query($conn,$query);
-        $row=$result->fetch_array(MYSQLI_ASSOC);
-      if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
-        echo"<script>alert('登入成功')</script>";
-        $_SESSION['account']=$_POST['account'];
-        setcookie('account',session_id(),time()+900,'/');
-        // header('Location: /webwork1/index.php');
-      }
-      else{
-        echo"<script>alert('登入失敗，帳號或密碼錯誤');window.location='/webwork1/sign-in/sign-in.php';</script>";
-      }
-      }
-      else{
-        echo"<script>alert('請輸入帳號密碼');window.location='/webwork1/sign-in/sign-in.php';</script>";
-      }
-     
-      
-      
-    }
+    // ini_set('session.gc_maxlifetime',15);
+    // session_start(); //開啟session
+    if(isset($_COOKIE['account'])){
+      echo"<script>alert('登入成功')</script>";
+     }
     if(isset($_POST['register'])){
       $query="INSERT INTO `user`(`account`,`password`) VALUES ('".$_POST["account"]."','".$_POST["password"]."')";
       $re=mysqli_query($conn,$query);
@@ -132,9 +113,9 @@
     }
     if(isset($_GET['d'])){
       if($_GET['d']==1){
-        session_destroy();
-        setcookie('account','',time()-900,'/');
-        header('Location: /webwork1/index.php');
+        // session_destroy();
+        setcookie('account','',time()-9,'/');
+        // header('Location: /webwork1/index.php');
       }
       
      }
@@ -225,7 +206,7 @@
             //   $_SESSION['account']=$_POST['account'];
             // }
             
-            if(!isset($_SESSION['account'])){
+            if(!isset($_COOKIE['account'])){
               echo "<a class='nav-link active' href='/webwork1/sign-in/sign-in.php'>登入/註冊</a>";
             }
             else{

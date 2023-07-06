@@ -101,7 +101,31 @@
   <body class="d-flex align-items-center py-4 bg-body-tertiary">
     <?php
     $conn=new mysqli("127.0.0.1","root","","webwork");
-    session_start();
+    // 登入
+    if(isset($_POST['login'])){
+      if($_POST["account"]!=null && $_POST["password"]!=null){
+        $query="SELECT * FROM `user` WHERE account='$_POST[account]'";
+        $result=mysqli_query($conn,$query);
+        $row=$result->fetch_array(MYSQLI_ASSOC);
+      if($row['account']==$_POST['account'] && $row['password']==$_POST['password']){
+        
+        // $_SESSION['account']=$_POST['account'];
+        setcookie('account',$_POST['account'],time()+6,'/');
+        
+        header('Location: /webwork1/message.php');
+        // echo"<script>alert('登入成功')</script>";
+      }
+      else{
+        echo"<script>alert('登入失敗，帳號或密碼錯誤');window.location='/webwork1/sign-in/sign-in.php';</script>";
+      }
+      }
+      else{
+        echo"<script>alert('請輸入帳號密碼');window.location='/webwork1/sign-in/sign-in.php';</script>";
+      }
+     
+      
+      
+    }
     ?>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
@@ -156,7 +180,7 @@
 
     
 <main class="form-signin w-100 m-auto">
-  <form method="post" action="/webwork1/index.php">
+  <form method="post" action="/webwork1/sign-in/sign-in.php">
     <!-- <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
