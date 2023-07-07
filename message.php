@@ -131,20 +131,21 @@
   </nav>
 </header>
   <div class="container">
-    <h1>留言板</h1>
     
+  <h1>留言板</h1>
     <!-- <div class="message">
       <p class="name">John Doe</p>
       <p class="timestamp">2023-07-06 10:30 AM</p>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla interdum tincidunt ipsum ac placerat.</p>
-    </div> -->
+    </div>
     
-    <!-- <div class="message">
+    <div class="message">
       <p class="name">Jane Smith</p>
       <p class="timestamp">2023-07-06 11:15 AM</p>
       <p>Donec ultricies ligula nec nulla scelerisque, eget lobortis leo tincidunt.</p>
       <button type="button">修改</button>
     </div> -->
+    
     <?php
         $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
         $query="SELECT * FROM `comment`";
@@ -176,7 +177,7 @@
           
 
     <!-- 留言表單 -->
-    <form method="POST" action="/webwork1/message.php">
+    <form id="form">
       <!-- <div class="form-group">
         <label for="name">姓名:</label>
         <input type="text" id="name" name="name">
@@ -187,7 +188,7 @@
         <textarea id="message" name="message"></textarea>
       </div>
       
-      <button type="submit" name="add_comment" id="add_commit">送出</button>
+      <button type="submit" name="add_comment" id="add_comment">送出</button>
       
     </form>
 
@@ -197,7 +198,7 @@
     $(document).ready(function() {
         var temp;
         $.ajax({
-            url: 'ajax/submit.php',
+            url: 'ajax/load.php',
             type: 'POST',
             success: function (result) {
               $(".container").html(result);
@@ -263,23 +264,24 @@
         });//on delete
 
         $("form").submit(function(){
-            const id=$(this).attr("id").split("-")[1];
-            
+            // const id=$(this).attr("id").split("-")[1];
+            console.log('有進來');
 
             $.ajax({
                 url: 'ajax/submit.php',
                 type: 'POST',
-                data: {ID: id,message: text},
+                data: {ID: id,message: $("message").val()},
                 success: function (result) {
                   $(".container").html(result);
+                  console.log(result);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert('Status: ' + textStatus)
                     alert('Error: ' + errorThrown)
                 }
-              }); //ajax
+            }); //ajax
 
-        });//on submit
+        });//submit
 
 
 
