@@ -133,54 +133,48 @@
   <div class="container">
     <h1>留言板</h1>
     
-    <div class="message">
+    <!-- <div class="message">
       <p class="name">John Doe</p>
       <p class="timestamp">2023-07-06 10:30 AM</p>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla interdum tincidunt ipsum ac placerat.</p>
-    </div>
+    </div> -->
     
-    <div class="message">
+    <!-- <div class="message">
       <p class="name">Jane Smith</p>
       <p class="timestamp">2023-07-06 11:15 AM</p>
       <p>Donec ultricies ligula nec nulla scelerisque, eget lobortis leo tincidunt.</p>
       <button type="button">修改</button>
-    </div>
+    </div> -->
     <?php
         $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
-        if(isset($_POST["add_comment"])){ //看有沒有按送出按鈕
-            if($_POST["massage"]==""){ //輸入內容是否為空，這個功能暫時沒用
-                $query="INSERT INTO `comment`(`account`, `date`, `text`) VALUES ('{$_COOKIE["account"]}',now(),'{$_POST["message"]}')";
-                $result=mysqli_query($conn,$query);
-            }
-            else{
-                echo"<script>alert('{$_POST["message"]}')</script>";
-            }
-            
-        }
         $query="SELECT * FROM `comment`";
         $result=mysqli_query($conn,$query);
         $row=mysqli_fetch_all($result);
         // 印出留言
-        foreach($row as $y => $value){
-            if($value[0] == $_COOKIE["account"]){
+        foreach($row as $value){
+            if($value[1] == $_COOKIE["account"]){
                 //有按鈕的
-                echo "<div class='message' id='message-{$y}'> 
-                <p class='name'>".$value[0]."</p>
-                <p class='timestamp'>".$value[1]."</p>
-                <p id='oldTxt-{$y}'>".$value[2]."</p>
-                <button type='button' id='update-{$y}'>修改</button>
+                echo "<div class='message' id='message-{$value[0]}'> 
+                <p class='name'>{$value[1]}</p>
+                <p class='timestamp'>{$value[2]}</p>
+                <p id='oldTxt-{$value[0]}'>{$value[3]}</p>
+                <button type='button' id='update-{$value[0]}'>修改</button>
+                <button type='button' id='delete-{$value[0]}'>刪除</button>
                 </div>";
             }
             else{
                 //沒按鈕的
-                echo "<div class='message' id='message-{$y}'>
-                <p class='name'>".$value[0]."</p>
-                <p class='timestamp'>".$value[1]."</p>
-                <p id='oldTxt-{$y}'>".$value[2]."</p></div>";
+                echo "<div class='message' id='message-{$value[0]}'> 
+                <p class='name'>{$value[1]}</p>
+                <p class='timestamp'>{$value[2]}</p>
+                <p id='oldTxt-{$value[0]}'>{$value[3]}</p>
+                </div>";
             }  
-        }
-       
+        } 
     ?>
+
+          
+
     <!-- 留言表單 -->
     <form method="POST" action="/webwork1/message.php">
       <!-- <div class="form-group">
@@ -193,41 +187,102 @@
         <textarea id="message" name="message"></textarea>
       </div>
       
-      <button type="submit" name="add_comment">送出</button>
+      <button type="submit" name="add_comment" id="add_commit">送出</button>
       
     </form>
 
   </div>
+
   <script>
     $(document).ready(function() {
-
-        $(document).on("click","button[id^='update-']",function(){
-            const id=$(this).attr("id").split("-")[-1];
-            console.log($(this))
-            $("#message-"+id).append(`<textarea id='newTxt-${id}'></textarea>`); //出現textarea
-            $("#message-"+id).append(`<button id='complete-${id}'></button>`); //出現完成按鈕
-            $("#update-"+id).remove(); //移除修改按鈕
-        });//on update
-
-        $(document).on("click","button[id^='complete-']",function(){
-            const id=$(this).attr("id").split("-")[-1];
-            var temp=$("#oldTxt-" + id).text();
-            $("#newTxt-"+id).remove(); //移除textarea
-            $("#complete-"+id).remove(); //移除完成按鈕 
-        });//on complete
-
+        var temp;
         $.ajax({
-            url: 'ajax/temp.php',
+            url: 'ajax/submit.php',
             type: 'POST',
-            data: {index: "id", text:$("#input-" + id).val()},
             success: function (result) {
-                $('#content').html(result)
+              $(".container").html(result);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 alert('Status: ' + textStatus)
                 alert('Error: ' + errorThrown)
             }
         }); //ajax
+        $(document).on("click","button[id^='update-']",function(){
+            const id=$(this).attr("id").split("-")[1];
+            temp=$("#oldTxt-" + id).text();
+            $("#delete-"+id).remove(); //移除刪除按鈕
+            $("#message-"+id).append(`<textarea id='newTxt-${id}' placeholder='${temp}'></textarea>`); //出現textarea
+            $("#message-"+id).append(`<button id='complete-${id}'>完成</button>`); //出現完成按鈕
+            $("#update-"+id).remove(); //移除修改按鈕
+            $("#oldTxt-"+id).remove(); //移除舊的內容
+        });//on update
+
+        $(document).on("click","button[id^='complete-']",function(){
+            const id=$(this).attr("id").split("-")[1];
+            if($("#newTxt-" + id).val()!=""){
+              $.ajax({
+                url: 'ajax/update.php',
+                type: 'POST',
+                data: {ID: id, text:$("#newTxt-" + id).val()},
+                success: function (result) {
+                  $("#message-"+id).append(`<p id='oldTxt-${id}'>${result}</p><button id='update-${id}'>修改</button><button id='delete-${id}'>刪除</button>`); //出現新的留言  
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Status: ' + textStatus)
+                    alert('Error: ' + errorThrown)
+                }
+              }); //ajax
+              }
+            else{
+              $("#message-"+id).append(`<p id='oldTxt-${id}'>${temp}</p><button id='update-${id}'>修改</button><button id='delete-${id}'>刪除</button>`); //出現舊的留言
+            }
+              $("#newTxt-"+id).remove(); //移除textarea
+              $("#complete-"+id).remove(); //移除完成按鈕
+              
+              
+          });//on complete  
+
+        $(document).on("click","button[id^='delete-']",function(){
+            const id=$(this).attr("id").split("-")[1];
+            temp=$("#oldTxt-" + id).text();
+            $("#message-"+id).remove(); //移除message
+
+            $.ajax({
+                url: 'ajax/delete.php',
+                type: 'POST',
+                data: {ID: id},
+                success: function () {
+                  alert('刪除成功') //出現刪除成功  
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Status: ' + textStatus)
+                    alert('Error: ' + errorThrown)
+                }
+              }); //ajax
+
+        });//on delete
+
+        $("form").submit(function(){
+            const id=$(this).attr("id").split("-")[1];
+            
+
+            $.ajax({
+                url: 'ajax/submit.php',
+                type: 'POST',
+                data: {ID: id,message: text},
+                success: function (result) {
+                  $(".container").html(result);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Status: ' + textStatus)
+                    alert('Error: ' + errorThrown)
+                }
+              }); //ajax
+
+        });//on submit
+
+
+
     }); // ready
     </script>
 </body>
