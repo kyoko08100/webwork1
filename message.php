@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
   <script src="../assets/js/color-modes.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.112.5">
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/">
-    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> 
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.112.5">
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/">
+  <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>留言板</title>
   <style>
     body {
@@ -133,61 +133,16 @@
   <div class="container">
     
   <h1>留言板</h1>
-    <!-- <div class="message">
-      <p class="name">John Doe</p>
-      <p class="timestamp">2023-07-06 10:30 AM</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla interdum tincidunt ipsum ac placerat.</p>
+  <div class="print">
     </div>
-    
-    <div class="message">
-      <p class="name">Jane Smith</p>
-      <p class="timestamp">2023-07-06 11:15 AM</p>
-      <p>Donec ultricies ligula nec nulla scelerisque, eget lobortis leo tincidunt.</p>
-      <button type="button">修改</button>
-    </div> -->
-    
-    <?php
-        $conn=new mysqli("127.0.0.1","root","","webwork"); //連接資料庫
-        $query="SELECT * FROM `comment`";
-        $result=mysqli_query($conn,$query);
-        $row=mysqli_fetch_all($result);
-        // 印出留言
-        foreach($row as $value){
-            if($value[1] == $_COOKIE["account"]){
-                //有按鈕的
-                echo "<div class='message' id='message-{$value[0]}'> 
-                <p class='name'>{$value[1]}</p>
-                <p class='timestamp'>{$value[2]}</p>
-                <p id='oldTxt-{$value[0]}'>{$value[3]}</p>
-                <button type='button' id='update-{$value[0]}'>修改</button>
-                <button type='button' id='delete-{$value[0]}'>刪除</button>
-                </div>";
-            }
-            else{
-                //沒按鈕的
-                echo "<div class='message' id='message-{$value[0]}'> 
-                <p class='name'>{$value[1]}</p>
-                <p class='timestamp'>{$value[2]}</p>
-                <p id='oldTxt-{$value[0]}'>{$value[3]}</p>
-                </div>";
-            }  
-        } 
-    ?>
-
-          
-
-    <!-- 留言表單 -->
+      <!-- 留言表單 -->
     <form id="form">
-      <!-- <div class="form-group">
-        <label for="name">姓名:</label>
-        <input type="text" id="name" name="name">
-      </div> -->
       
       <div class="form-group">
         <label for="message">留言:</label>
         <textarea id="message" name="message"></textarea>
       </div>
-      
+      <input type="file" id="fileInput" name="fileInput[]" accept=".pdf,.doc,.docx,.jpg" multiple="multiple">
       <button type="submit" name="add_comment" id="add_comment">送出</button>
       
     </form>
@@ -201,7 +156,7 @@
             url: 'ajax/load.php',
             type: 'POST',
             success: function (result) {
-              $(".container").html(result);
+              $(".print").html(result);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 alert('Status: ' + textStatus)
@@ -211,44 +166,100 @@
         $(document).on("click","button[id^='update-']",function(){
             const id=$(this).attr("id").split("-")[1];
             temp=$("#oldTxt-" + id).text();
-            $("#delete-"+id).remove(); //移除刪除按鈕
+
+              $("#delete-"+id).remove(); //移除刪除按鈕
+            
+            var aArr = $(`a[id^='file-${id}']`);
+            console.log(aArr);
+            aArr.each(function() {
+              Id = $(this).attr("id").substr(5);
+              console.log(Id);
+              $("#delete-" + Id).prop("hidden", false);
+            });
             $("#message-"+id).append(`<textarea id='newTxt-${id}' placeholder='${temp}'></textarea>`); //出現textarea
             $("#message-"+id).append(`<button id='complete-${id}'>完成</button>`); //出現完成按鈕
+            $("#message-"+id).append(`<input type="file" id="fileInputs-${id}" name="fileInputs[]" accept=".pdf,.doc,.docx,.jpg" multiple="multiple">`); //出現上傳檔案按鈕
             $("#update-"+id).remove(); //移除修改按鈕
             $("#oldTxt-"+id).remove(); //移除舊的內容
         });//on update
 
         $(document).on("click","button[id^='complete-']",function(){
-            const id=$(this).attr("id").split("-")[1];
-            if($("#newTxt-" + id).val()!=""){
-              $.ajax({
+          const id=$(this).attr("id").split("-")[1];
+            event.preventDefault();
+            var formData=new FormData();
+            formData.append('ID',id);
+            formData.append('text',$("#newTxt-" + id).val());
+            var files = $('#fileInputs-' + id)[0].files;
+            for (var i = 0; i < files.length; i++) {
+              formData.append('fileInputs[]',files[i],files[i].name);
+            }
+            // console.log(formData.getAll('fileInputs[]'));
+            var content=$("#newTxt-" + id).val()!="" ? $("#newTxt-" + id).val() : temp; //判斷484沒修改內文
+            console.log(content,$("#newTxt-" + id).val(),temp);
+            $.ajax({
                 url: 'ajax/update.php',
                 type: 'POST',
-                data: {ID: id, text:$("#newTxt-" + id).val()},
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (result) {
-                  $("#message-"+id).append(`<p id='oldTxt-${id}'>${result}</p><button id='update-${id}'>修改</button><button id='delete-${id}'>刪除</button>`); //出現新的留言  
+                  var response=JSON.parse(result,true);
+                  var aArr = $(`a[id^='file-${id}']`);
+                  var fid = "";
+                  aArr.each(function() {
+                    Id = $(this).attr("id").substr(5);
+                    fid = $(this).attr("id").split("-")[2];
+                    console.log(Id);
+                    $("#delete-" + Id).prop("hidden", true);
+                  });// 將檔案的刪除按鈕變回隱形
+                  for(var i=0;i < response.length;i++){
+                    var t = i + parseInt(fid) + 1;
+                    $("#message-"+id).append(`<a href='download.php?path=${response[i]}' id='file-${id}-${t}'>${response[i]}</a>
+                    <button type='button' id='delete-${id}-${t}' hidden>刪除</button><br>`);
+                  } // 插入超連結
+                  
+                  
+                  $("#message-"+id).append(`<p id='oldTxt-${id}'>${content}</p>`); //出現新的留言
+                  $("#message-"+id).append(`<button type='button' id='update-${id}' margin-right='5px'>修改</button><button type='button' id='delete-${id}'>刪除</button>`); //出現新的button
+                  $("#newTxt-"+id).remove(); //移除textarea
+                  $("#complete-"+id).remove(); //移除完成按鈕
+                  $("#fileInputs-"+id).remove(); //移除檔案按鈕
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert('Status: ' + textStatus)
                     alert('Error: ' + errorThrown)
                 }
               }); //ajax
-              }
-            else{
-              $("#message-"+id).append(`<p id='oldTxt-${id}'>${temp}</p><button id='update-${id}'>修改</button><button id='delete-${id}'>刪除</button>`); //出現舊的留言
-            }
-              $("#newTxt-"+id).remove(); //移除textarea
-              $("#complete-"+id).remove(); //移除完成按鈕
               
               
+                
           });//on complete  
 
         $(document).on("click","button[id^='delete-']",function(){
-            const id=$(this).attr("id").split("-")[1];
-            temp=$("#oldTxt-" + id).text();
-            $("#message-"+id).remove(); //移除message
-
-            $.ajax({
+          const idArr=$(this).attr("id").split("-");
+            if(idArr.length > 2){
+              id=idArr[1]+"-"+idArr[2];
+              
+              $("#file-"+id).remove(); //移除message
+              $.ajax({
+                url: 'ajax/deletefile.php',
+                type: 'POST',
+                data: {ID: id,filename:$("#file-"+id).text()},
+                success: function () {
+                  $("#delete-"+id).remove(); //移除刪除檔案按鈕
+                  alert('刪除成功') //出現刪除成功  
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  alert('Status: ' + textStatus)
+                  alert('Error: ' + errorThrown)
+                }
+              }); //ajax
+            }
+            else{
+              id=idArr[1];
+              temp=$("#oldTxt-" + id).text();
+              $("#message-"+id).remove(); //移除message
+              $.ajax({
                 url: 'ajax/delete.php',
                 type: 'POST',
                 data: {ID: id},
@@ -256,30 +267,47 @@
                   alert('刪除成功') //出現刪除成功  
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert('Status: ' + textStatus)
-                    alert('Error: ' + errorThrown)
+                  alert('Status: ' + textStatus)
+                  alert('Error: ' + errorThrown)
                 }
               }); //ajax
+            }
+            
 
         });//on delete
 
         $("form").submit(function(){
-            // const id=$(this).attr("id").split("-")[1];
-            console.log('有進來');
-
+          const id=$(this).attr("id").split("-")[1];
+            event.preventDefault();
+            var formData=new FormData(this);
+            formData.append('ID',id);
             $.ajax({
                 url: 'ajax/submit.php',
                 type: 'POST',
-                data: {ID: id,message: $("message").val()},
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (result) {
-                  $(".container").html(result);
-                  console.log(result);
+                  $(".print").html(result);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert('Status: ' + textStatus)
                     alert('Error: ' + errorThrown)
                 }
             }); //ajax
+            // $.ajax({
+            //     url: 'ajax/load.php',
+            //     type: 'POST',
+            //     processData: false,
+            //     contentType: false,
+            //     success: function (result) {
+            //       $(".print").html(result);
+            //     },
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //         alert('Status: ' + textStatus)
+            //         alert('Error: ' + errorThrown)
+            //     }
+            // }); //ajax
 
         });//submit
 
