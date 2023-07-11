@@ -116,7 +116,7 @@
               echo "<a class='nav-link active' href='/webwork1/sign-in/sign-in.php'>登入/註冊</a>";
             }
             else{
-              echo "<a class='nav-link active' href='/webwork1/index.php?d=1'>登出</a>";
+              echo "<a class='nav-link active' style='color:blue' href='/webwork1/index.php?d=1'>登出</a>";
             }
             
             ?>
@@ -170,10 +170,8 @@
               $("#delete-"+id).remove(); //移除刪除按鈕
             
             var aArr = $(`a[id^='file-${id}']`);
-            console.log(aArr);
             aArr.each(function() {
               Id = $(this).attr("id").substr(5);
-              console.log(Id);
               $("#delete-" + Id).prop("hidden", false);
             });
             $("#message-"+id).append(`<textarea id='newTxt-${id}' placeholder='${temp}'></textarea>`); //出現textarea
@@ -195,7 +193,7 @@
             }
             // console.log(formData.getAll('fileInputs[]'));
             var content=$("#newTxt-" + id).val()!="" ? $("#newTxt-" + id).val() : temp; //判斷484沒修改內文
-            console.log(content,$("#newTxt-" + id).val(),temp);
+            // console.log(content,$("#newTxt-" + id).val(),temp);
             $.ajax({
                 url: 'ajax/update.php',
                 type: 'POST',
@@ -209,7 +207,7 @@
                   aArr.each(function() {
                     Id = $(this).attr("id").substr(5);
                     fid = $(this).attr("id").split("-")[2];
-                    console.log(Id);
+                    // console.log(Id);
                     $("#delete-" + Id).prop("hidden", true);
                   });// 將檔案的刪除按鈕變回隱形
                   for(var i=0;i < response.length;i++){
@@ -239,13 +237,15 @@
           const idArr=$(this).attr("id").split("-");
             if(idArr.length > 2){
               id=idArr[1]+"-"+idArr[2];
+              console.log($("#file-"+id).text()); 
               
-              $("#file-"+id).remove(); //移除message
               $.ajax({
                 url: 'ajax/deletefile.php',
                 type: 'POST',
                 data: {ID: id,filename:$("#file-"+id).text()},
-                success: function () {
+                success: function (result) {
+                  console.log(result);
+                  $("#file-"+id).remove(); //移除message
                   $("#delete-"+id).remove(); //移除刪除檔案按鈕
                   alert('刪除成功') //出現刪除成功  
                 },
